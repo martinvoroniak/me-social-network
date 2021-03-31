@@ -1,0 +1,29 @@
+.nav {
+    grid-area: n;
+    background-color: burlywood;
+    padding: 20px;
+}
+
+.item a {
+    color: darkslateblue;
+    text-decoration: none;
+}
+
+.item a.activeLink {
+    color: gold;
+}
+
+.friends {
+    color: #172109;
+    padding: 50px;
+}
+
+.avaFriends img {
+    display: grid;
+    grid-auto-columns: 50px;
+    grid-gap: 10px;
+    padding: 10px;
+    width: 50px;
+    height: 50px;
+    border-radius: 30px;
+}
