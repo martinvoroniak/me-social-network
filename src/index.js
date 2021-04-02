@@ -8,6 +8,7 @@ import {HashRouter} from 'react-router-dom';
 import {Provider} from 'react-redux';
 
 ReactDOM.render(
+    // commit
     <HashRouter>
         <Provider store={store}>
             <App/>
