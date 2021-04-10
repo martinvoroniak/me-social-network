@@ -1,4 +1,5 @@
 import {profileAPI} from "../api/api";
+import {stopSubmit} from "redux-form";
 
 // КОНСТАНТИ, просто назви які ми використовуватимо
 const ADD_POST = 'ADD_POST';
@@ -22,7 +23,7 @@ let initialState = {
 const profileReducer = (state = initialState, action) => {
 
     // SWITCH-CASE, СВІЧ КЕЙСИ
-    switch(action.type) {
+    switch (action.type) {
         case ADD_POST: {
             let newPost = {
                 id: 5,
@@ -48,7 +49,7 @@ const profileReducer = (state = initialState, action) => {
         }
 
         case SAVE_PHOTO_SUCCESS: {
-            return {...state, profile: {...state.profile, photos: action.photos }}
+            return {...state, profile: {...state.profile, photos: action.photos}}
         }
         default:
             return state;
@@ -63,40 +64,46 @@ export const deletePost = (postId) => ({type: DELETE_POST, postId})
 export const savePhotoSuccess = (photos) => ({type: SAVE_PHOTO_SUCCESS, photos})
 
 // САНКИ, THUNK
-export const getUsersProfile = (userId) => {
-    return (dispatch) => {
-        profileAPI.getProfile(userId).then(response => {
+export const getUsersProfile = (userId) => async (dispatch) => {
+    const response = await profileAPI.getProfile(userId);
             dispatch(setUserProfile(response.data));
-        });
-    }
 }
 
-export const getStatus = (userId) => {
-    return (dispatch) => {
-        profileAPI.getStatus(userId).then(response => {
+export const getStatus = (userId) => async (dispatch) => {
+    const response = await profileAPI.getStatus(userId);
             dispatch(setStatus(response.data));
-        });
-    }
 }
 
-export const updateStatus = (status) => {
-    return (dispatch) => {
-        profileAPI.updateStatus(status).then(response => {
-            if(response.data.resultCode === 0) {
+export const updateStatus = (status) => async (dispatch) => {
+    const response = await profileAPI.updateStatus(status);
+            if (response.data.resultCode === 0) {
                 dispatch(setStatus(status));
             }
-        });
+}
+
+export const savePhoto = (file) => async (dispatch) => {
+    try {
+        const response = await profileAPI.savePhoto(file);
+        if (response.data.resultCode === 0) {
+            dispatch(savePhotoSuccess(response.data.data.photos));
+        }
+    } catch (error) {
+        debugger;
     }
 }
 
-export const savePhoto = (file) => {
-    return (dispatch) => {
-        profileAPI.savePhoto(file).then(response => {
-            if(response.data.resultCode === 0) {
-                dispatch(savePhotoSuccess(response.data.data.photos));
-            }
-        });
+export const saveProfile = (profile) => async (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    const response = await profileAPI.saveProfile(profile)
+    if (response.data.resultCode === 0) {
+        dispatch(getUsersProfile(userId));
+    }
+    else {
+        dispatch(stopSubmit('edit-profile', {_error: response.data.messages[0]} ));
+        //{"contacts" : {"facebook": response.data.messages[0]} }
+        return Promise.reject(response.data.messages[0]);
     }
 }
+
 
 export default profileReducer;
