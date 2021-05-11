@@ -3,6 +3,7 @@ import User from "./User";
 import Paginator from "../Common/Paginator/Paginator";
 import {UserType} from "../../types/Types";
 
+
 type PropsType = {
     currentPage: number
     totalUsersCount: number
